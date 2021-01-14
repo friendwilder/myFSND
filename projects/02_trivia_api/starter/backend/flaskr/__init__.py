@@ -61,16 +61,18 @@ def create_app(test_config=None):
   def get_questions():
     q = Question.query.order_by(Question.id).all()
     questions = [question.format() for question in q]
-    data = Category.query.order_by(Category.id).all()
-    categories = [cat.format() for cat in data]
+    categories = Category.query.order_by(Category.id).all()
+    categories_dict = {}
+    for category in categories:
+      categories_dict[category.id] = category.type
     total_questions = len(Question.query.all())
-    current_category = ''
+    current_category = 'Science'
     return jsonify({
       'success': True,
-      'categories': list(categories),
-      'questions': list(questions),
+      'categories': categories_dict,
+      'questions': questions,
       'total_questions': total_questions,
-      'current_category': current_category
+      'current_category': None
     })
 
   '''

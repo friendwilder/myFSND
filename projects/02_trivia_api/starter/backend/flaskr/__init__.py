@@ -1,5 +1,5 @@
 import os
-from flask import Flask, request, abort, jsonify
+from flask import Flask, request, abort, jsonify, render_template
 from flask_sqlalchemy import SQLAlchemy
 from flask_cors import CORS
 import random
@@ -16,17 +16,34 @@ def create_app(test_config=None):
   '''
   @TODO: Set up CORS. Allow '*' for origins. Delete the sample route after completing the TODOs
   '''
+  CORS(app)
+  cors = CORS(app, resources={r"/*": {"origins": "*"}})
 
   '''
   @TODO: Use the after_request decorator to set Access-Control-Allow
   '''
+      # CORS Headers 
+  @app.after_request
+  def after_request(response):
+      response.headers.add('Access-Control-Allow-Headers', 'Content-Type,Authorization,true')
+      response.headers.add('Access-Control-Allow-Methods', 'GET,PATCH,POST,DELETE,OPTIONS')
+      return response
 
   '''
   @TODO: 
   Create an endpoint to handle GET requests 
   for all available categories.
   '''
-
+  @app.route('/categories', methods=['GET'])
+  # @cross_origin()
+  def get_categories():
+    data = Category.query.order_by(Category.id).all()
+    categories = [cat.format() for cat in data]
+    return jsonify({
+      'success': True,
+      'categories': categories
+      })
+    return render_template('index.html', data=Category.query.all())
 
   '''
   @TODO: 
@@ -40,6 +57,21 @@ def create_app(test_config=None):
   ten questions per page and pagination at the bottom of the screen for three pages.
   Clicking on the page numbers should update the questions. 
   '''
+  @app.route('/questions', methods=['GET'])
+  def get_questions():
+    q = Question.query.order_by(Question.id).all()
+    questions = [question.format() for question in q]
+    data = Category.query.order_by(Category.id).all()
+    categories = [cat.format() for cat in data]
+    total_questions = len(Question.query.all())
+    current_category = ''
+    return jsonify({
+      'success': True,
+      'categories': list(categories),
+      'questions': list(questions),
+      'total_questions': total_questions,
+      'current_category': current_category
+    })
 
   '''
   @TODO: 

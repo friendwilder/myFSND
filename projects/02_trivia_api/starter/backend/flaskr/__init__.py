@@ -8,6 +8,15 @@ from models import setup_db, Question, Category
 
 QUESTIONS_PER_PAGE = 10
 
+def paginate_questions(request, selection):
+  page = request.args.get('page', 1, type=int)
+  start = (page - 1) * 10
+  end = start + 10
+  questions = [question.format() for question in selection]
+  current_questions = questions[start:end]
+  return current_questions
+
+
 def create_app(test_config=None):
   # create and configure the app
   app = Flask(__name__)
@@ -37,11 +46,13 @@ def create_app(test_config=None):
   @app.route('/categories', methods=['GET'])
   # @cross_origin()
   def get_categories():
+    categories_dict = {}
     data = Category.query.order_by(Category.id).all()
-    categories = [cat.format() for cat in data]
+    for category in data:
+      categories_dict[category.id] = category.type
     return jsonify({
       'success': True,
-      'categories': categories
+      'categories': categories_dict
       })
     return render_template('index.html', data=Category.query.all())
 
@@ -60,13 +71,13 @@ def create_app(test_config=None):
   @app.route('/questions', methods=['GET'])
   def get_questions():
     q = Question.query.order_by(Question.id).all()
-    questions = [question.format() for question in q]
+    questions = paginate_questions(request, q)
     categories = Category.query.order_by(Category.id).all()
     categories_dict = {}
     for category in categories:
       categories_dict[category.id] = category.type
     total_questions = len(Question.query.all())
-    current_category = 'Science'
+    current_category = None
     return jsonify({
       'success': True,
       'categories': categories_dict,
@@ -82,6 +93,27 @@ def create_app(test_config=None):
   TEST: When you click the trash icon next to a question, the question will be removed.
   This removal will persist in the database and when you refresh the page. 
   '''
+  @app.route('/questions/<int:id>', methods=['DELETE'])
+  def delete_question(id):
+    try:
+      question = Question.query.filter(Question.id == id).one_or_more()
+
+      if question is None:
+        abort(404)
+      
+      question.delete()
+      selection = question.query.order_by(Question.id).all()
+      current_questions = paginate_questions(request, selection)
+      return jsonify({
+        'success': True,
+        'deleted': id,
+        'questions': current_questions,
+        'total_questions' : len(Question.query.all())
+      })
+
+    except:
+      abort(422)
+
 
   '''
   @TODO: 

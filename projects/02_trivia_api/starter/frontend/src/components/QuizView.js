@@ -22,14 +22,14 @@ class QuizView extends Component {
 
   componentDidMount(){
     $.ajax({
-      url: `/categories`, //TODO: update request URL
+      url: `http://127.0.0.1:5000/categories`, //TODO: update request URL
       type: "GET",
       success: (result) => {
         this.setState({ categories: result.categories })
         return;
       },
       error: (error) => {
-        alert('Unable to load categories. Please try your request again')
+        alert('Unable to load categories. Please try request again')
         return;
       }
     })

@@ -95,14 +95,17 @@ def create_app(test_config=None):
   '''
   @app.route('/questions/<int:id>', methods=['DELETE'])
   def delete_question(id):
+    print(id)
     try:
-      question = Question.query.filter(Question.id == id).one_or_more()
+      question = Question.query.filter(Question.id == id)
+      # print(question)
 
       if question is None:
         abort(404)
       
       question.delete()
-      selection = question.query.order_by(Question.id).all()
+      # print(question)
+      selection = Question.query.order_by(Question.id).all()
       current_questions = paginate_questions(request, selection)
       return jsonify({
         'success': True,
@@ -125,6 +128,34 @@ def create_app(test_config=None):
   the form will clear and the question will appear at the end of the last page
   of the questions list in the "List" tab.  
   '''
+  @app.route('/questions', methods=['POST'])
+  def add_question():
+    body = request.get_json()
+
+    question = body.get('question', None)
+    answer = body.get('answer', None)
+    difficulty = body.get('difficulty', None )
+    category = body.get('category', None)
+
+    try:
+      new_question = Question(question=question, answer=answer, category=category, difficulty=difficulty)
+      new_question.insert()
+
+      selection = Question.query.order_by(Question.id).all()
+      current_questions = paginate_questions(request, selection)
+
+      return jsonify({
+        'success': True,
+        'created': new_question.id,
+        'questions': current_questions,
+        'total_questions': len(Question.query.all())
+      })
+
+    except:
+      abort(422)
+
+    return app
+
 
   '''
   @TODO: 

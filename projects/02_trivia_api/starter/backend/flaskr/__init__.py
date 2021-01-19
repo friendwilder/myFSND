@@ -97,14 +97,12 @@ def create_app(test_config=None):
   def delete_question(id):
     print(id)
     try:
-      question = Question.query.filter(Question.id == id)
-      # print(question)
+      question = Question.query.get(id)
 
       if question is None:
         abort(404)
       
       question.delete()
-      # print(question)
       selection = Question.query.order_by(Question.id).all()
       current_questions = paginate_questions(request, selection)
       return jsonify({

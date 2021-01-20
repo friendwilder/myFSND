@@ -132,22 +132,32 @@ def create_app(test_config=None):
 
     question = body.get('question', None)
     answer = body.get('answer', None)
-    difficulty = body.get('difficulty', None )
+    difficulty = body.get('difficulty', None)
     category = body.get('category', None)
+    search_term = body.get('searchTerm', None)
 
     try:
-      new_question = Question(question=question, answer=answer, category=category, difficulty=difficulty)
-      new_question.insert()
+      if search_term:
+        selection = Question.query.order_by(Question.id).filter(Question.question.ilike('%{}%'.format(search_term)))
+        current_questions = paginate_questions(request, selection)
+        return jsonify({
+          'success': True,
+          'questions': current_questions,
+          'total_questions': len(Question.query.all())
+        })
+      else:
+        new_question = Question(question=question, answer=answer, category=category, difficulty=difficulty)
+        new_question.insert()
 
-      selection = Question.query.order_by(Question.id).all()
-      current_questions = paginate_questions(request, selection)
+        selection = Question.query.order_by(Question.id).all()
+        current_questions = paginate_questions(request, selection)
 
-      return jsonify({
-        'success': True,
-        'created': new_question.id,
-        'questions': current_questions,
-        'total_questions': len(Question.query.all())
-      })
+        return jsonify({
+          'success': True,
+          'created': new_question.id,
+          'questions': current_questions,
+          'total_questions': len(Question.query.all())
+        })
 
     except:
       abort(422)
@@ -165,6 +175,9 @@ def create_app(test_config=None):
   only question that include that string within their question. 
   Try using the word "title" to start. 
   '''
+  @app.route('/questions', methods=['POST'])
+  def search_term(term):
+    print(term)
 
   '''
   @TODO: 

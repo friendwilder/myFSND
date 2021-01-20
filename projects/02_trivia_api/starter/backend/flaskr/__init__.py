@@ -54,7 +54,6 @@ def create_app(test_config=None):
       'success': True,
       'categories': categories_dict
       })
-    return render_template('index.html', data=Category.query.all())
 
   '''
   @TODO: 
@@ -95,7 +94,6 @@ def create_app(test_config=None):
   '''
   @app.route('/questions/<int:id>', methods=['DELETE'])
   def delete_question(id):
-    print(id)
     try:
       question = Question.query.get(id)
 
@@ -177,7 +175,7 @@ def create_app(test_config=None):
   '''
   @app.route('/questions', methods=['POST'])
   def search_term(term):
-    print(term)
+    print(term + 'not implemented')
 
   '''
   @TODO: 
@@ -187,6 +185,17 @@ def create_app(test_config=None):
   categories in the left column will cause only questions of that 
   category to be shown. 
   '''
+  @app.route('/categories/<int:id>/questions', methods=['GET'])
+  def get_category_questions(id):
+    selection = Question.query.order_by(Question.id).filter(Question.category==id)
+    current_questions = paginate_questions(request, selection)
+    return jsonify({
+      'success': True,
+      'questions': current_questions,
+      'total_questions': len(Question.query.all())
+          })
+  
+
 
 
   '''

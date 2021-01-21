@@ -71,6 +71,10 @@ def create_app(test_config=None):
   def get_questions():
     q = Question.query.order_by(Question.id).all()
     questions = paginate_questions(request, q)
+
+    if len(questions) == 0:
+      abort(404)
+
     categories = Category.query.order_by(Category.id).all()
     categories_dict = {}
     for category in categories:
@@ -244,7 +248,7 @@ def create_app(test_config=None):
       return jsonify({
           "success": False, 
           "error": 404,
-          "message": "Not found"
+          "message": "Resource not found"
           }), 404
 
 

@@ -187,16 +187,14 @@ def create_app(test_config=None):
   '''
   @app.route('/categories/<int:id>/questions', methods=['GET'])
   def get_category_questions(id):
-    selection = Question.query.order_by(Question.id).filter(Question.category==id)
-    current_questions = paginate_questions(request, selection)
+    questions_in_category = Question.query.order_by(Question.id).filter(Question.category==id)
+    current_questions = paginate_questions(request, questions_in_category)
     return jsonify({
       'success': True,
       'questions': current_questions,
       'total_questions': len(Question.query.all())
           })
   
-
-
 
   '''
   @TODO: 
@@ -209,6 +207,34 @@ def create_app(test_config=None):
   one question at a time is displayed, the user is allowed to answer
   and shown whether they were correct or not. 
   '''
+  @app.route('/quizzes', methods=['POST'])
+  def play_quiz():
+    body = request.get_json()
+
+    previous_questions = body.get('previous_questions', None)
+    quiz_category = body.get('quiz_category', None)
+
+    try:
+      questions_in_category = Question.query.order_by(Question.id).filter(Question.category==int(quiz_category['id']))
+      questions_quantity = len(questions_in_category.all())
+
+      questions_in_category = paginate_questions(request, questions_in_category)
+      ids_in_category = [question['id'] for question in questions_in_category]
+
+      remaining_questions = list(set(ids_in_category).difference(previous_questions))
+
+      choosen_id = random.choice(remaining_questions)
+
+      return jsonify({
+        'success': True,
+        'question': [question for question in questions_in_category if question['id']==choosen_id][0]
+        })
+
+    except:
+      return('failed')
+
+
+
 
   '''
   @TODO: 

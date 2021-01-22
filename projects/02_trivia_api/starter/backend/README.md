@@ -72,8 +72,9 @@ This README is missing documentation of your endpoints. Below is an example for 
 
 Endpoints
 GET '/categories'
-GET ...
-POST ...
+GET '/questions'
+DELETE '/questions/<int:id>'
+POST /questions
 DELETE ...
 
 GET '/categories'
@@ -86,6 +87,45 @@ GET '/categories'
 '4' : "History",
 '5' : "Entertainment",
 '6' : "Sports"}
+
+GET '/questions'
+- Fetches an array of objects, each object contains the question id, its difficulty, the question per se and the answer as strings and the category it belongs.
+- Request Arguments: None
+- Returns: Returns and object with multiple key: value pairs.
+  "questions": [
+    {
+      "answer": "Apollo 13", 
+      "category": 5, 
+      "difficulty": 4, 
+      "id": 2, 
+      "question": "What movie earned Tom Hanks his third straight Oscar nomination, in 1996?"
+    }, 
+    {
+      "answer": "Tom Cruise", 
+      "category": 5, 
+      "difficulty": 4, 
+      "id": 4, 
+      "question": "What actor did author Anne Rice first denounce, then praise in the role of her beloved Lestat?"
+    }
+
+DELETE '/questions/<int:id>'
+- Deletes the specified question using its id
+- Request Arguments: Question id
+- Returns: The id of the deleted question
+  "deleted": 37
+
+POST /questions
+- It has two functions, 1) to store a new question or 2)to search for a question which contains the provided string.
+- Request Arguments: 
+    Question(String)
+    Answer(String)
+    Difficulty(Int) - The lower the easier
+    Category(Int) - Currently only 1 to 6 categories available
+
+    Search Term(String)
+- Returns: The id of the newly created question or an array of questions(Objects)
+
+
 
 ```
 

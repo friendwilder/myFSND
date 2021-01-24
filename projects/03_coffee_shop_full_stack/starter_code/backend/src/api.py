@@ -22,7 +22,7 @@ db_drop_and_create_all()
 ## Temp endpoint for testing
 
 @app.route('/drinks-detail')
-@requires_auth
+@requires_auth('get:drinks-detail')
 def headers(jwt):
     # @TODO unpack the request header
     print(jwt)

@@ -19,6 +19,15 @@ CORS(app)
 # db_drop_and_create_all()
 
 ## ROUTES
+## Temp endpoint for testing
+
+@app.route('/drinks-detail')
+def headers():
+    # @TODO unpack the request header
+    print('Not implemented')
+    return 'Not implemented'
+
+
 '''
 @TODO implement endpoint
     GET /drinks

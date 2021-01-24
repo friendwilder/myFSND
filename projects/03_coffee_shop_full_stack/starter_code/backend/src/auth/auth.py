@@ -5,7 +5,7 @@ from jose import jwt
 from urllib.request import urlopen
 
 
-AUTH0_DOMAIN = 'udacity-fsnd.auth0.com'
+AUTH0_DOMAIN = 'dev-gowilder.us.auth0.com'
 ALGORITHMS = ['RS256']
 API_AUDIENCE = 'dev'
 
@@ -30,8 +30,19 @@ class AuthError(Exception):
         it should raise an AuthError if the header is malformed
     return the token part of the header
 '''
+
 def get_token_auth_header():
-   raise Exception('Not Implemented')
+    if 'Authorization' not in request.headers:
+        abort(401)
+    auth_header = request.headers['Authorization']
+    header_parts = auth_header.split(' ')
+
+    if len(header_parts) != 2:
+        abort(401)
+    elif header_parts[0].lower() != 'bearer':
+        abort(401)
+
+    return header_parts[1]
 
 '''
 @TODO implement check_permissions(permission, payload) method
@@ -77,10 +88,10 @@ def requires_auth(permission=''):
     def requires_auth_decorator(f):
         @wraps(f)
         def wrapper(*args, **kwargs):
-            token = get_token_auth_header()
-            payload = verify_decode_jwt(token)
-            check_permissions(permission, payload)
-            return f(payload, *args, **kwargs)
+            jwt = get_token_auth_header()
+            #payload = verify_decode_jwt(token)
+            #check_permissions(permission, payload)
+            return f(jwt, *args, **kwargs)
 
         return wrapper
     return requires_auth_decorator

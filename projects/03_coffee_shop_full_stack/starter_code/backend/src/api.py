@@ -16,16 +16,17 @@ CORS(app)
 !! NOTE THIS WILL DROP ALL RECORDS AND START YOUR DB FROM SCRATCH
 !! NOTE THIS MUST BE UNCOMMENTED ON FIRST RUN
 '''
-# db_drop_and_create_all()
+db_drop_and_create_all()
 
 ## ROUTES
 ## Temp endpoint for testing
 
 @app.route('/drinks-detail')
-def headers():
+@requires_auth
+def headers(jwt):
     # @TODO unpack the request header
-    print('Not implemented')
-    return 'Not implemented'
+    print(jwt)
+    return 'Implementation done'
 
 
 '''

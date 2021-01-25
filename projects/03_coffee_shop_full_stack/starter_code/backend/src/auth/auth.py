@@ -137,7 +137,7 @@ def verify_decode_jwt(token):
     raise AuthError({
         'code': 'invalid_header',
         'description': 'Unable to find the appropiate key'
-    }, 400)
+    }, 401)
     # raise Exception('Not Implemented')
 
 '''

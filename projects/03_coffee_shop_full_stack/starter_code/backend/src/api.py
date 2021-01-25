@@ -37,17 +37,17 @@ def headers(jwt):
     returns status code 200 and json {"success": True, "drinks": drinks} where drinks is the list of drinks
         or appropriate status code indicating reason for failure
 '''
-@app.route('/drinks')
+@app.route('/drinks', methods=['GET'])
 def get_drinks():
     drinks = Drink.query.order_by(Drink.id).all()
+    print(drinks)
     drinks_short_format = [drink.short() for drink in drinks]
 
     if len(drinks_short_format) == 0:
         abort(404)
-
+    # print(drinks_short_format)
     return jsonify({
-        'success': True,
-        'drinks': drinks_short_format
+        'success': True
     })  
 
 '''
@@ -69,7 +69,23 @@ def get_drinks():
     returns status code 200 and json {"success": True, "drinks": drink} where drink an array containing only the newly created drink
         or appropriate status code indicating reason for failure
 '''
+@app.route('/drinks', methods=['POST'])
+@requires_auth('post:drinks')
+def create_drink(permission):
+    body = request.get_json()
+    title = body.get('title', None)
+    recipe = body.get('recipe', None)
 
+    try:
+        new_drink = Drink(title=title, recipe=json.dumps(recipe))
+        new_drink.insert()
+
+        return jsonify({
+            'success': True
+        })
+
+    except:
+        abort(422)
 
 '''
 @TODO implement endpoint

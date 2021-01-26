@@ -40,17 +40,18 @@ def headers(jwt):
 @app.route('/drinks', methods=['GET'])
 def get_drinks():
     drinks = Drink.query.order_by(Drink.id).all()
-    print(drinks)
     drinks_short_format = [drink.short() for drink in drinks]
-    print(drinks_short_format)
 
-    if len(drinks_short_format) == 0:
-        abort(404)
+    try:
+        if len(drinks_short_format) == 0:
+            abort(404)
 
-    return jsonify({
-        'success': True,
-        'drinks': drinks_short_format
-    })  
+        return jsonify({
+            'success': True,
+            'drinks': drinks_short_format
+        }) 
+    except Exception:
+        abort(422) 
 
 '''
 @TODO implement endpoint
@@ -97,7 +98,7 @@ def create_drink(permission):
             'drinks': new_drink.long()
         })
 
-    except:
+    except Exception:
         abort(422)
 
 '''
@@ -129,9 +130,9 @@ def edit_drink(permission, id):
             'drinks': [drink.long()]
         })
 
-    except:
+    except Exception:
         abort(422)
-    return 'not implemented'
+
 
 
 '''
@@ -157,7 +158,7 @@ def delete_drink(permission, id):
             'success': True,
             'delete': id
         })
-    except:
+    except Exception:
         abort(422)
 
 ## Error Handling
